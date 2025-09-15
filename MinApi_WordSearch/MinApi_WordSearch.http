@@ -1,0 +1,6 @@
+@MinApi_WordSearch_HostAddress = http://localhost:5086
+
+GET {{MinApi_WordSearch_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
