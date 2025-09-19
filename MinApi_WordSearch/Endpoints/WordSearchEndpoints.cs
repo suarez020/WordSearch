@@ -18,7 +18,9 @@ namespace MinApi_WordSearch.Endpoints
                 .Produces(StatusCodes.Status500InternalServerError);
         }
 
-        private static async Task<IResult> ProcesarBusquedaPalabras(RequestWordSearch request, IWordSearchService svc)
+        #region
+        private static async Task<IResult> ProcesarBusquedaPalabras(RequestWordSearch request, IWordSearchService svc)  
+        /// IWordSearchService svc = aquí el método depende de una abstracción(la interfaz), no de una implementación concreta.Eso es inyeccion.
         {
             if (request == null || request.Palabras == null || request.Matriz == null)// Validaciones. 
                 return Results.BadRequest("Request inválido. 'palabras' y 'matriz' son obligatorios.");
@@ -37,5 +39,7 @@ namespace MinApi_WordSearch.Endpoints
                 return Results.StatusCode(500);
             }
         }
+        #endregion
     }
+
 }

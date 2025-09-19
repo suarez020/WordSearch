@@ -12,12 +12,12 @@ namespace MinApi_WordSearch.Services
             Console.WriteLine($"Matriz de {filas} filas por {columnas} columnas.");
             List<ResultadoPalabras> results = new List<ResultadoPalabras>();
 
-            foreach (string rawWord in request.Palabras)       /// Itera sobre cada palabra a buscar buscando palabras.count.
+            foreach (string rawWord in request.Palabras)      
             {
                 Console.WriteLine($"\n--- Buscando la palabra: '{rawWord}' ---"); 
 
-                string word = rawWord?.Trim() ?? string.Empty;/// Limpiamos
-                if (string.IsNullOrEmpty(word))
+                string palabra = rawWord?.Trim() ?? string.Empty;
+                if (string.IsNullOrEmpty(palabra))
                 {
                     Console.WriteLine("Palabra es nula, vacía o solo espacios. Añadiendo resultado 'no encontrada'.");
                     results.Add(new ResultadoPalabras { Palabra = rawWord ?? "", Encontrada = false });
@@ -25,48 +25,46 @@ namespace MinApi_WordSearch.Services
                 }
 
                 bool encontrada = false;
-                ResultadoPalabras? foundResult = null;
-                var objetivo = word.ToUpperInvariant();                  /// Convierte la palabra a mayúsculas para la comparación.
+                ResultadoPalabras? ResultadoEncontrado = null;
+                var objetivo = palabra.ToUpperInvariant();               
 
-                /// *Bucle principal: recorre cada celda de la matriz    /// Bucle de filas. La búsqueda se detiene si ya se encontró la palabra.
+                
                 for (int i = 0; i < filas && !encontrada; i++) 
                 {
-                    for (int j = 0; j < columnas && !encontrada; j++)    /// Bucle de columnas. También se detiene si se encuentra.
+                    for (int j = 0; j < columnas && !encontrada; j++)    
                     {
-                        if (DataGridView[i, j] != objetivo[0]) continue; /// Verifica si la letra de la celda actual coincide con la primera letra de la palabra.
+                        if (DataGridView[i, j] != objetivo[0]) continue; ///letra de la celda actual coincide con la primera letra de la palabra.
                                                                 Console.WriteLine($"Encontrada coincidencia para la primera letra '{objetivo[0]}' en [{i},{j}].");
 
-                        foreach (var (pasosVertical, pasosHorizontal, name) in DireccionPalabra)          /// *Itera sobre cada una de las 8 direcciones posibles.
+                        foreach (var (pasosVertical, pasosHorizontal, name) in DireccionPalabra)
                         {
                             Console.WriteLine($"  Intentando la dirección: {name}");
-                            /// La llamada a MatchesDirection es el verdadero trabajo de búsqueda.
-                            if (MatchesDirection(DataGridView, i, j, pasosVertical, pasosHorizontal, objetivo))
-                            {
-                                Console.WriteLine($"  ¡Palabra '{objetivo}' encontrada en la dirección {name}!");
-                                encontrada = true;
-
-                                /// Calcula las coordenadas finales de la palabra encontrada
-                                var endRow = i + pasosVertical * (objetivo.Length - 1);
-                                var endCol = j + pasosHorizontal * (objetivo.Length - 1);
-                                foundResult = new ResultadoPalabras
-                                {
-                                    Palabra = word,
-                                    Encontrada = true,
-                                    Inicia = new Posicion { Row = i, Col = j },
-                                    Finaliza = new Posicion { Row = endRow, Col = endCol },
-                                    Direction = name
-                                };
-                                break; /// Detiene el bucle de direcciones una vez que la palabra ha sido encontrada.
-                            }
+                         
+                                    if (MatchesDirection(DataGridView, i, j, pasosVertical, pasosHorizontal, objetivo))
+                                    {
+                                        Console.WriteLine($"  ¡Palabra '{objetivo}' encontrada en la dirección {name}!");
+                                        encontrada = true;
+                                        var endRow = i + pasosVertical * (objetivo.Length - 1);
+                                        var endCol = j + pasosHorizontal * (objetivo.Length - 1);
+                                        ResultadoEncontrado = new ResultadoPalabras
+                                        {
+                                            Palabra = palabra,
+                                            Encontrada = true,
+                                            Inicia = new Posicion { Row = i, Col = j },
+                                            Finaliza = new Posicion { Row = endRow, Col = endCol },
+                                            Direction = name
+                                        };
+                                        break;
+                                    }
                         }
                     }
                 }
-                if (foundResult != null){///Añade el resultado final a la lista de resultados
-                    Console.WriteLine($"Resultado: La palabra '{word}' fue encontrada.");
-                    results.Add(foundResult);
+                if (ResultadoEncontrado != null){///Añade el resultado final a la lista de resultados
+                    Console.WriteLine($"Resultado: La palabra '{palabra}' fue encontrada.");
+                    results.Add(ResultadoEncontrado);
                 }else{
-                    Console.WriteLine($"Resultado: La palabra '{word}' NO fue encontrada.");
-                    results.Add(new ResultadoPalabras { Palabra = word, Encontrada = false });
+                    Console.WriteLine($"Resultado: La palabra '{palabra}' NO fue encontrada.");
+                    results.Add(new ResultadoPalabras { Palabra = palabra, Encontrada = false });
                 }
             }
             Console.WriteLine("\nProceso de búsqueda de todas las palabras finalizado. Retornando resultados.");
@@ -75,7 +73,7 @@ namespace MinApi_WordSearch.Services
 
         #region Metodos Auxiliares:
         private static readonly (int pasosVertical, int pasosHorizontal, string name)[] DireccionPalabra = new[]
-{
+        {
             ( 0,  1, "derecha"),
             ( 0, -1, "izquierda"),
             ( 1,  0, "abajo"),
@@ -88,49 +86,42 @@ namespace MinApi_WordSearch.Services
 
         private static bool MatchesDirection(char[,] grid, int startFila, int startColumna, int pasosVertical, int pasosHorizontal, string objetivo)
         {
-            int filas    = grid.GetLength(0); // 14
-            int columnas = grid.GetLength(1); // 14
-
+            int filas    = grid.GetLength(0); 
+            int columnas = grid.GetLength(1); 
             Console.WriteLine($"  Verificando la palabra '{objetivo}' desde la posición [{startFila},{startColumna}].");
 
-            for (int i = 0; i < objetivo.Length; i++)  ///iteramos cada palalabra "canguro"
+            for (int i = 0; i < objetivo.Length; i++)
             {
-                // Calcula las coordenadas de la celda actual en la dirección dada.
-                // 'pasosVertical' y 'pasosHorizontal' son los "pasos" que toma en cada iteración.
-                int row = startFila + pasosVertical * i;
-                int col = startColumna + pasosHorizontal * i;
+                int row = startFila + pasosVertical * i;      ///fila en matriz
+                int col = startColumna + pasosHorizontal * i;///columna en matriz
 
                 Console.WriteLine($"Iteración {i}: Verificando celda [{row},{col}] vs. letra '{objetivo[i]}'.");
                 
-                ///________________________________________________________________________________________________________________________________________
-                /// Condición 1: Se asegura de que la celda actual esté dentro de los límites de la cuadrícula.
-                /// Si no lo está, la palabra no puede encajar.
-                if (row < 0 || row >= filas || col < 0 || col >= columnas)
+                
+                ///_______________________________límites de la cuadrícula.
+                if (row < 0 || row >= filas || col < 0 || col >= columnas)    
                 {
                     Console.WriteLine("¡Fuera de los límites! Retornando 'false'.");
                     return false;
                 }
-                ///________________________________________________________________________________________________________________________________________
-                /// Condición 2: Compara la letra en la cuadrícula con la letra en la palabra objetivo.
-                /// Si las letras no coinciden, la palabra no está en esta dirección.
+                ///_______________________________Compara la letra en la cuadrícula con la letra en la palabra objetivo.
                 if (grid[row, col] != objetivo[i])
                 {
                     Console.WriteLine($"No coincide. La celda tiene '{grid[row, col]}', pero se esperaba '{objetivo[i]}'. Retornando 'false'.");
                     return false;
                 }
-                ///________________________________________________________________________________________________________________________________________
-                
-                Console.WriteLine($"Coincide. La letra en la celda es '{grid[row, col]}'.");
+
+               Console.WriteLine($"Coincide. La letra en la celda es '{grid [row, col]}'.");
             
             }
-            /// Si el bucle termina sin retornar 'false', significa que todas las letras coincidieron.
-            Console.WriteLine($"  ¡Todas las letras coincidieron! Retornando 'true'.");
+            
+            Console.WriteLine($"Todas las letras coincidieron.");
             return true;
         }
 
         private static char[ , ] LlenandoMatriz(List<string> FilasDeMatriz)
         {
-            Console.WriteLine("Inicio de ParseMatrix. Validando la matriz de entrada.");//validación básica
+            Console.WriteLine("Inicio de ParseMatrix. Validando la matriz de entrada.");///validación básica
             if (FilasDeMatriz == null || FilasDeMatriz.Count == 0){
                 Console.WriteLine("La matriz de entrada está vacía o es nula.");
                 throw new ArgumentException("matriz vacía.");
@@ -140,45 +131,40 @@ namespace MinApi_WordSearch.Services
             int cantidadFilas = filas.Count;
             Console.WriteLine($"Total de filas a procesar: {cantidadFilas}.");
             string[] firstSplit = filas[0].Split (new[] {',',' ',';'}, StringSplitOptions.RemoveEmptyEntries);
-            int cantidadColumnas = firstSplit.Length;///primera fila saber cuántas columnas hay.
+            int cantidadColumnas = firstSplit.Length;
             Console.WriteLine($"Se determinó que la matriz tendrá {cantidadColumnas} columnas.");
 
             char[,] matriz = new char[cantidadFilas, cantidadColumnas];///inicializa ya sabemos la cantidad
             Console.WriteLine("Matriz de caracteres creada. Comenzando a llenar celdas...");
 
-            ///recorrer las filas y llenar la matriz vamos a llenar la matriz de i,j
-            for (int i = 0; i < cantidadFilas; i++)//fila
+            for (int i = 0; i < cantidadFilas; i++)
             {
                 Console.WriteLine($"Procesando fila {i}...");
                 var tokens = filas[i].Split(new[] { ',', ' ', ';' }, StringSplitOptions.RemoveEmptyEntries);
 
-                /// Validación de consistencia: todas las filas deben tener la misma cantidad de elementos
-                if (tokens.Length != cantidadColumnas)
+                if (tokens.Length != cantidadColumnas)///todas las filas deben tener la misma cantidad de elementos
                 {
                     Console.WriteLine($"Error en la fila {i}. Se encontraron {tokens.Length} elementos, pero se esperaban {cantidadColumnas}.");
-                    throw new ArgumentException($"Fila {i} tiene {tokens.Length} elementos; se esperaba {cantidadColumnas}.");
+                      throw new ArgumentException($"Fila {i} tiene {tokens.Length} elementos; se esperaba {cantidadColumnas}.");
                 }
+                        for (int j = 0; j < cantidadColumnas; j++)
+                        {
+                            string letra = tokens[j].Trim();
 
-                ///recorrer cada elemento de la fila Col
-                for (int j = 0; j < cantidadColumnas; j++)
-                {
-                    string t = tokens[j].Trim();
+                            if (letra.Length != 1)
+                            {
+                                Console.WriteLine($"Error en la celda  [{i},{j}]. El valor '{letra}' no es un solo carácter.");
+                                throw new ArgumentException($"Elemento [{i},{j}] inválido: '{letra}'. Debe ser un único carácter.");
+                            }
 
-                    if (t.Length != 1)
-                    {
-                        Console.WriteLine($"Error en la celda  [{i},{j}]. El valor '{t}' no es un solo carácter.");
-                        throw new ArgumentException($"Elemento [{i},{j}] inválido: '{t}'. Debe ser un único carácter.");
-                    }
-
-                    // Asignar el carácter a la matriz, convirtiéndolo a mayúscula
-                    matriz[i, j] = char.ToUpperInvariant(t[0]);
-                    Console.WriteLine($"Asignando '{char.ToUpperInvariant(t[0])}' a la celda [{i},{j}].");
-                }
+                            matriz[i, j] = char.ToUpperInvariant(letra[0]);
+                            Console.WriteLine($"Asignando '{char.ToUpperInvariant(letra[0])}' a la celda [{i},{j}].");
+                        }
             }
 
             Console.WriteLine("Matriz procesada con éxito.");
             return matriz;
         }
+        #endregion
     }
-    #endregion
 }
